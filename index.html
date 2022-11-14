@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Modificador Qr</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="containerPrincipal">
+    <div class="contImg" id="contImg">
+      <img class="imgQr" id="img" src=""/>
+        <div id="divInput">
+          <p>Seleccione el archivo o arrástrelo a este área.</p>
+          <br/>
+          <button class="butFile" onclick="selectFile()">Seleccione el archivo</button>
+          <input type="file" name="imagensubida" id="inputFile" accept="image/png, .jpeg, .jpg, image/gif" hidden>
+        </div>
+      <button class="butClose" id="butCerrar" onclick="closeImg()">X</button>
+    </div>
+    <button class="butLoad" id="button" onclick="loadImg()">Cargar imagen</button>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
