@@ -1,81 +1,109 @@
-const imagen = document.getElementById("img");
-const input = document.getElementById("inputFile");
-const divInput = document.getElementById("divInput");
-const butCargar = document.getElementById("butCargar");
-const butCerrar = document.getElementById("butCerrar");
-const dropArea = document.getElementById("contImg");
-
 /**
  * call to input
  */
 function selectFile() {
-  input.click();
+  document.getElementById("inputFile").click();
 }
 
 /**
- * receive file and putit in image
- * @param {*} data
+ * Listen input change
+ */
+document.getElementById("inputFile").addEventListener("change", () => {
+  loadImg(document.getElementById("inputFile").files[0]);
+  document.getElementById("contImg").classList.add("active");
+});
+
+/**
+ * receive file and load image
+ * @param {*} data  Image to load
  */
 function loadImg(data) {
-  let file;
-  data ? (file = data) : (file = input.files[0]);
+  //evaluate if data is empty
+  data
+    ? (tipo = data.type.substring(0, 7))
+    : () => {
+        return;
+      };
 
-  if (file == null) {
-    alert("Debe seleccionar una imagen");
-  } else {
+  //evaluate if data is an image
+  if (tipo.includes("image/")) {
     const reader = new FileReader();
     reader.addEventListener(
       "load",
       () => {
-        imagen.src = reader.result;
-        divInput.style.visibility = "hidden";
-        imagen.style.visibility = "visible";
-        butCerrar.style.visibility = "visible";
+        const image = reader.result;
+        const parent = document.getElementById("contImg");
+        createImage(image, parent);
       },
       false
     );
-    if (file) {
-      reader.readAsDataURL(file);
+    if (data) {
+      reader.readAsDataURL(data);
     }
-  }
-}
-
-/**
- * Clean input and change html values
- */
-function closeImg() {
-  input.value = "";
-  divInput.style.visibility = "visible";
-  imagen.style.visibility = "hidden";
-  butCerrar.style.visibility = "hidden";
-}
-
-/**
- * change drogArea values
- */
-dropArea.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  dropArea.classList.add("active");
-});
-
-/**
- * Return drogArea values
- */
-dropArea.addEventListener("dragleave", (e) => {
-  e.preventDefault();
-  dropArea.classList.remove("active");
-});
-
-/**
- * call loadImg only with image extension
- */
-dropArea.addEventListener("drop", (e) => {
-  e.preventDefault();
-  const file = e.dataTransfer.files;
-  const tipo = file[0].type.substring(0, 7);
-  if (tipo.includes("image/")) {
-    loadImg(file[0]);
   } else {
     alert("Sólo se pueden cargar imágenes.");
   }
+}
+
+/**
+ * Create image and button tags
+ * @param {*} image is file image
+ * @param {*} parent is parent tag
+ */
+function createImage(image, parent) {
+  //hide file selection
+  document.getElementById("divInput").classList.remove("active");
+  //make a new image tag
+  let newImg = document.createElement("img");
+  newImg.src = image;
+  newImg.id = "newImg";
+  //make a new button tag
+  let newBut = document.createElement("button");
+  newBut.id = "butClose";
+  newBut.innerHTML = "X";
+  //add event to close it
+  newBut.addEventListener("click", () => {
+    removeImg();
+  });
+  //push image and button
+  parent.appendChild(newImg);
+  parent.appendChild(newBut);
+}
+
+/**
+ * Remove html tags and change html values
+ */
+function removeImg() {
+  const parent = document.getElementById("contImg");
+  const image = document.getElementById("newImg");
+  const butClose = document.getElementById("butClose");
+  parent.removeChild(image);
+  parent.removeChild(butClose);
+  document.getElementById("divInput").classList.add("active");
+  document.getElementById("contImg").classList.remove("active");
+}
+
+/**
+ * Add drogArea values
+ */
+document.getElementById("contImg").addEventListener("dragover", (e) => {
+  e.preventDefault();
+  document.getElementById("contImg").classList.add("active");
+});
+
+/**
+ * Remove dragArea values
+ */
+document.getElementById("contImg").addEventListener("dragleave", (e) => {
+  e.preventDefault();
+  document.getElementById("contImg").classList.remove("active");
+});
+
+/**
+ * call loadImg with drop image
+ */
+document.getElementById("contImg").addEventListener("drop", (e) => {
+  e.preventDefault();
+  const file = e.dataTransfer.files;
+  loadImg(file[0]);
 });

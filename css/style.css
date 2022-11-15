@@ -12,7 +12,7 @@ body {
 
 .containerPrincipal {
   width: 400px;
-  height: 520px;
+  height: 400px;
   padding: 10px;
   background-color: #80d4e1;
   border: 2px solid #79bec8;
@@ -40,34 +40,9 @@ body {
   height: 350px;
   margin: 25px;
   object-fit: contain;
-  visibility: hidden;
 }
 
-.contImg div {
-  width: 250px;
-  height: 50px;
-  position: absolute;
-  left: 75px;
-  top: 150px;
-  border-radius: 5px;
-  visibility: visibility;
-}
-
-.contImg div {
-  font-size: 20px;
-}
-
-.butFile {
-  width: 200px;
-  height: 50px;
-  font-size: 18px;
-  background-color: cyan;
-  margin: 10px;
-  border-radius: 50px;
-  cursor: pointer;
-}
-
-.butClose {
+#butClose {
   width: 30px;
   height: 30px;
   background-color: red;
@@ -78,7 +53,40 @@ body {
   right: 0px;
   top: 0px;
   border-radius: 5px;
+  cursor: pointer;
+}
+
+.contImg div {
+  width: 250px;
+  height: 50px;
+  position: absolute;
+  left: 75px;
+  top: 150px;
+  border-radius: 5px;
+}
+
+.contImg div {
+  font-size: 20px;
+}
+
+.divInput {
+  /* z-index: -10; */
   visibility: hidden;
+}
+
+.divInput.active {
+  /* z-index: 0; */
+  visibility: visible;
+}
+
+.butFile {
+  width: 200px;
+  height: 50px;
+  font-size: 18px;
+  background-color: cyan;
+  margin: 10px;
+  border-radius: 50px;
+  cursor: pointer;
 }
 
 .butLoad {
