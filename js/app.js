@@ -8,9 +8,19 @@ function selectFile() {
 /**
  * Listen input change
  */
-document.getElementById("inputFile").addEventListener("change", () => {
-  loadImg(document.getElementById("inputFile").files[0]);
-  document.getElementById("contImg").classList.add("active");
+document.getElementById("inputFile").addEventListener("change", async () => {
+  const validar = document.getElementById("inputFile").files[0];
+  if (validar != undefined && validar.type.substring(0, 5) == "image") {
+    const image = await loadImg(document.getElementById("inputFile").files[0]);
+    const parent = document.getElementById("contImg");
+    //hide file selection
+    createImage(image, parent);
+    changeContImg();
+  } else {
+    if (validar != undefined) {
+      alert("Formato no aceptado, se debe introducir una imagen");
+    }
+  }
 });
 
 /**
@@ -18,30 +28,27 @@ document.getElementById("inputFile").addEventListener("change", () => {
  * @param {*} data  Image to load
  */
 function loadImg(data) {
-  //evaluate if data is empty
-  data
-    ? (tipo = data.type.substring(0, 7))
-    : () => {
-        return;
-      };
-
-  //evaluate if data is an image
-  if (tipo.includes("image/")) {
-    const reader = new FileReader();
-    reader.addEventListener(
-      "load",
-      () => {
-        const image = reader.result;
-        const parent = document.getElementById("contImg");
-        createImage(image, parent);
-      },
-      false
-    );
-    if (data) {
-      reader.readAsDataURL(data);
-    }
-  } else {
-    alert("Sólo se pueden cargar imágenes.");
+  try {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      if (data) {
+        reader.readAsDataURL(data);
+      }
+      reader.addEventListener(
+        "load",
+        () => {
+          const image = reader.result;
+          if (image != undefined) {
+            resolve(image);
+          } else {
+            reject("Esto funciona con fallo");
+          }
+        },
+        false
+      );
+    });
+  } catch (e) {
+    console.log("Error al procesar la imagen \n" + e);
   }
 }
 
@@ -51,8 +58,6 @@ function loadImg(data) {
  * @param {*} parent is parent tag
  */
 function createImage(image, parent) {
-  //hide file selection
-  document.getElementById("divInput").classList.remove("active");
   //make a new image tag
   let newImg = document.createElement("img");
   newImg.src = image;
@@ -63,7 +68,8 @@ function createImage(image, parent) {
   newBut.innerHTML = "X";
   //add event to close it
   newBut.addEventListener("click", () => {
-    removeImg();
+    removeImg(parent, newImg, newBut);
+    resetContImg();
   });
   //push image and button
   parent.appendChild(newImg);
@@ -73,18 +79,28 @@ function createImage(image, parent) {
 /**
  * Remove html tags and change html values
  */
-function removeImg() {
-  const parent = document.getElementById("contImg");
-  const image = document.getElementById("newImg");
-  const butClose = document.getElementById("butClose");
+function removeImg(parent, image, butClose) {
   parent.removeChild(image);
   parent.removeChild(butClose);
-  document.getElementById("divInput").classList.add("active");
-  document.getElementById("contImg").classList.remove("active");
 }
 
 /**
- * Add drogArea values
+ * Change parameters contImg
+ */
+function changeContImg() {
+  document.getElementById("divInput").classList.remove("active");
+  document.getElementById("contImg").classList.add("active");
+}
+
+/**
+ * Reset parameters contImg
+ */
+function resetContImg() {
+  document.getElementById("divInput").classList.add("active");
+  document.getElementById("contImg").classList.remove("active");
+}
+/**
+ * Add style drogArea values
  */
 document.getElementById("contImg").addEventListener("dragover", (e) => {
   e.preventDefault();
@@ -92,7 +108,7 @@ document.getElementById("contImg").addEventListener("dragover", (e) => {
 });
 
 /**
- * Remove dragArea values
+ * Remove style dragArea values
  */
 document.getElementById("contImg").addEventListener("dragleave", (e) => {
   e.preventDefault();
@@ -102,8 +118,15 @@ document.getElementById("contImg").addEventListener("dragleave", (e) => {
 /**
  * call loadImg with drop image
  */
-document.getElementById("contImg").addEventListener("drop", (e) => {
+document.getElementById("contImg").addEventListener("drop", async (e) => {
   e.preventDefault();
   const file = e.dataTransfer.files;
-  loadImg(file[0]);
+  if (file[0].type.substring(0, 5) == "image") {
+    const image = await loadImg(file[0]);
+    const parent = document.getElementById("contImg");
+    createImage(image, parent);
+    changeContImg();
+  } else {
+    alert("Formato no aceptado, se debe introducir una imagen");
+  }
 });
