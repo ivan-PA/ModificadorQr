@@ -75,7 +75,6 @@ body {
 }
 
 .divInput.active {
-  /* z-index: 0; */
   visibility: visible;
 }
 

@@ -9,17 +9,23 @@ function selectFile() {
  * Listen input change
  */
 document.getElementById("inputFile").addEventListener("change", async () => {
-  const validar = document.getElementById("inputFile").files[0];
-  if (validar != undefined && validar.type.substring(0, 5) == "image") {
-    const image = await loadImg(document.getElementById("inputFile").files[0]);
-    const parent = document.getElementById("contImg");
-    //hide file selection
-    createImage(image, parent);
-    changeContImg();
-  } else {
-    if (validar != undefined) {
+  try {
+    const file = document.getElementById("inputFile").files[0];
+    if (!file) return;
+
+    if (file.type.substring(0, 5) == "image") {
+      const image = await loadImg(
+        document.getElementById("inputFile").files[0]
+      );
+      const parent = document.getElementById("contImg");
+      //hide file selection
+      createImage(image, parent);
+      changeContImg();
+    } else {
       alert("Formato no aceptado, se debe introducir una imagen");
     }
+  } catch (e) {
+    console.log("Se ha producido un error en el cambio del input\n" + e);
   }
 });
 
@@ -28,28 +34,25 @@ document.getElementById("inputFile").addEventListener("change", async () => {
  * @param {*} data  Image to load
  */
 function loadImg(data) {
-  try {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      if (data) {
-        reader.readAsDataURL(data);
-      }
-      reader.addEventListener(
-        "load",
-        () => {
-          const image = reader.result;
-          if (image != undefined) {
-            resolve(image);
-          } else {
-            reject("Esto funciona con fallo");
-          }
-        },
-        false
-      );
-    });
-  } catch (e) {
-    console.log("Error al procesar la imagen \n" + e);
-  }
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    if (data) {
+      reader.readAsDataURL(data);
+    }
+    reader.addEventListener(
+      "load",
+      () => {
+        const image = reader.result;
+
+        if (image != undefined) {
+          resolve(image);
+        } else {
+          reject("Esto funciona con fallo");
+        }
+      },
+      false
+    );
+  });
 }
 
 /**
@@ -59,11 +62,12 @@ function loadImg(data) {
  */
 function createImage(image, parent) {
   //make a new image tag
-  let newImg = document.createElement("img");
+  const newImg = document.createElement("img");
   newImg.src = image;
   newImg.id = "newImg";
+
   //make a new button tag
-  let newBut = document.createElement("button");
+  const newBut = document.createElement("button");
   newBut.id = "butClose";
   newBut.innerHTML = "X";
   //add event to close it
