@@ -18,8 +18,7 @@ document.getElementById("inputFile").addEventListener("change", async () => {
         document.getElementById("inputFile").files[0]
       );
       const parent = document.getElementById("contImg");
-      //hide file selection
-      createImage(image, parent);
+      createImage(image, parent, () => resetContImg());
       changeContImg();
     } else {
       alert("Formato no aceptado, se debe introducir una imagen");
@@ -59,8 +58,9 @@ function loadImg(data) {
  * Create image and button tags
  * @param {*} image is file image
  * @param {*} parent is parent tag
+ * @param {*} callback is a function reset tag
  */
-function createImage(image, parent) {
+function createImage(image, parent, callback) {
   //make a new image tag
   const newImg = document.createElement("img");
   newImg.src = image;
@@ -73,7 +73,7 @@ function createImage(image, parent) {
   //add event to close it
   newBut.addEventListener("click", () => {
     removeImg(parent, newImg, newBut);
-    resetContImg();
+    callback();
   });
   //push image and button
   parent.appendChild(newImg);
@@ -128,7 +128,7 @@ document.getElementById("contImg").addEventListener("drop", async (e) => {
   if (file[0].type.substring(0, 5) == "image") {
     const image = await loadImg(file[0]);
     const parent = document.getElementById("contImg");
-    createImage(image, parent);
+    createImage(image, parent, () => resetContImg());
     changeContImg();
   } else {
     alert("Formato no aceptado, se debe introducir una imagen");
