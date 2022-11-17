@@ -17,6 +17,7 @@ document.getElementById("inputFile").addEventListener("change", async () => {
       const image = await loadImg(
         document.getElementById("inputFile").files[0]
       );
+
       const parent = document.getElementById("contImg");
       createImage(image, parent, () => resetContImg());
       changeContImg();
@@ -34,23 +35,26 @@ document.getElementById("inputFile").addEventListener("change", async () => {
  */
 function loadImg(data) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    if (data) {
-      reader.readAsDataURL(data);
-    }
-    reader.addEventListener(
-      "load",
-      () => {
-        const image = reader.result;
-
-        if (image != undefined) {
-          resolve(image);
-        } else {
-          reject("Esto funciona con fallo");
+    if (data.size) {
+      try {
+        const reader = new FileReader();
+        reader.onload = function () {
+          const image = reader.result;
+          if (image != undefined) {
+            resolve(image);
+          } else {
+            reject("Esto funciona con fallo");
+          }
+        };
+        if (data) {
+          reader.readAsDataURL(data);
         }
-      },
-      false
-    );
+      } catch (e) {
+        alert("Se ha producido un error al cargar la imagen.");
+      }
+    } else {
+      alert("Error con la imagen, compruebe que no está corrupta.");
+    }
   });
 }
 
@@ -60,7 +64,8 @@ function loadImg(data) {
  * @param {*} parent is parent tag
  * @param {*} callback is a function reset tag
  */
-function createImage(image, parent, callback) {
+function createImage(image, parent, onRemoveCompleted) {
+  // function createImage(image, parent, callback) {
   //make a new image tag
   const newImg = document.createElement("img");
   newImg.src = image;
@@ -73,7 +78,8 @@ function createImage(image, parent, callback) {
   //add event to close it
   newBut.addEventListener("click", () => {
     removeImg(parent, newImg, newBut);
-    callback();
+    onRemoveCompleted();
+    // callback();
   });
   //push image and button
   parent.appendChild(newImg);
@@ -125,12 +131,18 @@ document.getElementById("contImg").addEventListener("dragleave", (e) => {
 document.getElementById("contImg").addEventListener("drop", async (e) => {
   e.preventDefault();
   const file = e.dataTransfer.files;
-  if (file[0].type.substring(0, 5) == "image") {
-    const image = await loadImg(file[0]);
-    const parent = document.getElementById("contImg");
-    createImage(image, parent, () => resetContImg());
-    changeContImg();
+  const image = await loadImg(file[0]);
+  const parent = document.getElementById("contImg");
+  if (!document.getElementById("newImg")) {
+    if (file[0].type.substring(0, 5) == "image") {
+      createImage(image, parent, () => resetContImg());
+      changeContImg();
+    } else {
+      alert("Formato no aceptado, se debe introducir una imagen");
+    }
   } else {
-    alert("Formato no aceptado, se debe introducir una imagen");
+    alert(
+      "Ya existe una imagen, no se puede cargar otra hasta que no se elimine la existente."
+    );
   }
 });
