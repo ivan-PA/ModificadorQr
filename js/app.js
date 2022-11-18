@@ -19,7 +19,7 @@ document.getElementById("inputFile").addEventListener("change", async () => {
       );
 
       const parent = document.getElementById("contImg");
-      createImage(image, parent, () => resetContImg());
+      createImage(image, parent, resetContImg);
       changeContImg();
     } else {
       alert("Formato no aceptado, se debe introducir una imagen");
@@ -35,25 +35,17 @@ document.getElementById("inputFile").addEventListener("change", async () => {
  */
 function loadImg(data) {
   return new Promise((resolve, reject) => {
-    if (data.size) {
-      try {
-        const reader = new FileReader();
-        reader.onload = function () {
-          const image = reader.result;
-          if (image != undefined) {
-            resolve(image);
-          } else {
-            reject("Esto funciona con fallo");
-          }
-        };
-        if (data) {
-          reader.readAsDataURL(data);
-        }
-      } catch (e) {
-        alert("Se ha producido un error al cargar la imagen.");
-      }
-    } else {
-      alert("Error con la imagen, compruebe que no está corrupta.");
+    const reader = new FileReader();
+
+    reader.onload = function () {
+      const image = reader.result;
+      resolve(image);
+    };
+    reader.onerror = function () {
+      reject("Error al cargar la imagen, compruebe que no está corrupta");
+    };
+    if (data) {
+      reader.readAsDataURL(data);
     }
   });
 }
@@ -79,7 +71,6 @@ function createImage(image, parent, onRemoveCompleted) {
   newBut.addEventListener("click", () => {
     removeImg(parent, newImg, newBut);
     onRemoveCompleted();
-    // callback();
   });
   //push image and button
   parent.appendChild(newImg);
@@ -131,18 +122,21 @@ document.getElementById("contImg").addEventListener("dragleave", (e) => {
 document.getElementById("contImg").addEventListener("drop", async (e) => {
   e.preventDefault();
   const file = e.dataTransfer.files;
-  const image = await loadImg(file[0]);
-  const parent = document.getElementById("contImg");
-  if (!document.getElementById("newImg")) {
-    if (file[0].type.substring(0, 5) == "image") {
+  if (file[0].type.substring(0, 5) == "image") {
+    const image = await loadImg(file[0]);
+    const parent = document.getElementById("contImg");
+
+    if (!document.getElementById("newImg")) {
+      // if (parent.childElementCount == 1) {
+
       createImage(image, parent, () => resetContImg());
       changeContImg();
     } else {
-      alert("Formato no aceptado, se debe introducir una imagen");
+      alert(
+        "Ya existe una imagen, no se puede cargar otra hasta que no se elimine la existente."
+      );
     }
   } else {
-    alert(
-      "Ya existe una imagen, no se puede cargar otra hasta que no se elimine la existente."
-    );
+    alert("Formato no aceptado, se debe introducir una imagen");
   }
 });
